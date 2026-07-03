@@ -36,7 +36,7 @@
 
     <div class="add-btn" onclick="toggleModal(true)">+</div>
 
-    <div class="upload-modal" id="uploadModal">
+    <div class="upload-modal" id="upload-modal">
         <div class="upload-content">
             <span class="close-btn" onclick="toggleModal(false)">&times;</span>
             <h3>New Post</h3>
@@ -130,7 +130,7 @@
         }
 
         function toggleModal(show) {
-            const modal = document.getElementById('uploadModal');
+            const modal = document.getElementById('upload-modal');
             if (show) modal.classList.add('active');
             else modal.classList.remove('active');
         }
@@ -139,7 +139,6 @@
             const fileName = e.target.files[0] ? e.target.files[0].name : 'Select an image...';
             document.getElementById('file-name-display').textContent = fileName;
         });
-        <!---->
     </script>
 </body>
 </html>
