@@ -12,6 +12,7 @@ from flask import (
 
 from models import Like, Post, db
 from services.storage import get_file_url, upload_to_seaweed
+from werkzeug.security import check_password_hash, generate_password_hash
 
 feed_bp = Blueprint("feed", __name__)
 
@@ -30,17 +31,25 @@ def show_feed():
                 Like.query.filter_by(user_id=user_id, post_id=post.id).first()
                 is not None
             )
-        file_url = get_file_url(post.image_filename)
+
+        has_password = bool(post.password)
+        if has_password:
+            file_url = ""
+            location = ""
+        else:
+            file_url = get_file_url(post.image_filename)
+            location = post.location
 
         birds_data.append(
             {
                 "id": post.id,
                 "name": post.title,
                 "desc": post.description,
-                "loc": post.location,
+                "loc": location,
                 "img": file_url,
                 "likes_count": likes_count,
                 "is_liked": is_liked,
+                "has_password": has_password,
             }
         )
 
@@ -54,6 +63,7 @@ def show_feed():
                 "img": "",
                 "likes_count": 0,
                 "is_liked": False,
+                "has_password": False,
             }
         ]
     return render_template(
@@ -95,14 +105,34 @@ def upload():
         file.stream.seek(0)
         object_key = upload_to_seaweed(file.stream, file.filename)
 
+    password_input = request.form.get("password")
+    post_password = (
+        password_input.strip() if password_input and password_input.strip() else None
+    )
+    hash_pw = generate_password_hash(post_password)
+
     new_post = Post(
         title=request.form.get("title"),
         location=request.form.get("location"),
         description=request.form.get("description"),
         image_filename=object_key,
         user_id=session["user_id"],
+        password=hash_pw,
     )
     db.session.add(new_post)
     db.session.commit()
 
     return redirect(url_for("feed.show_feed"))
+
+
+@feed_bp.route("/unlock/<int:post_id>", methods=["POST"])
+def unlock(post_id):
+    """Unlock post."""
+    post = Post.query.get_or_404(post_id)
+
+    password_input = request.form.get("password")
+    if not post.password or check_password_hash(post.password, password_input):
+        file_url = get_file_url(post.image_filename)
+        return jsonify({"success": True, "img": file_url, "loc": post.location}), 200
+
+    return jsonify({"error": "Incorrect password"}), 401

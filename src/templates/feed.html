@@ -9,12 +9,25 @@
     <a href="/logout" class="logout-btn">Logout ({{ username }})</a>
     <div id="feed">
         <div class="post">
-            {% if birds_data and birds_data[0].img %}
-                <img id="bird-img" class="post-img" src="{{ birds_data[0].img }}" alt="Bird" loading="lazy">
+            {% if birds_data %}
+                <img id="bird-img" class="post-img"
+                     src="{{ '' if birds_data[0].has_password else birds_data[0].img }}"
+                     alt="Bird" loading="lazy"
+                     style="{{ 'display:none;' if birds_data[0].has_password else '' }}">
+                <div id="password-lock" class="password-lock-form" style="{{ 'display:block;' if birds_data[0].has_password else 'display:none;' }} margin: 20px; text-align: center;">
+                    <p>Please enter the password to see the photo and location:</p>
+                    <div class="form-group">
+                        <label class="input-label">Password (optional)</label>
+                        <input type="text" name="password" placeholder="Password">
+                    </div>
+
+                    <button type="button" onclick="unlockPost(event)" class="btn">Unblock</button>
+                </div>
+
                 <div class="info">
                    <div id="bird-name" class="title">{{ birds_data[0].name }}</div>
                    <div id="bird-desc" class="desc">{{ birds_data[0].desc }}</div>
-                   <span id="bird-loc" class="loc">{{ birds_data[0].loc }}</span>
+                   <span id="bird-loc" class="loc">{{ '' if birds_data[0].has_password else birds_data[0].loc }}</span>
 
                    <div class="post-actions" style="margin-top: 10px;">
                     <button onclick="toggleLike(event)" class="btn like-button" style="z-index: 10;">
@@ -80,18 +93,73 @@
         function nextBird() {
             if (birds.length <= 1) return;
             currentIndex = (currentIndex + 1) % birds.length;
-            document.getElementById('bird-img').src = birds[currentIndex].img;
-            document.getElementById('bird-name').innerText = birds[currentIndex].name;
-            document.getElementById('bird-desc').innerText = birds[currentIndex].desc;
-            document.getElementById('bird-loc').innerText = birds[currentIndex].loc;
+            const currentBird = birds[currentIndex];
+            document.getElementById('unlock-password').value = '';
 
-            document.getElementById('like-count').innerText = birds[currentIndex].likes_count;
+            if (currentBird.has_password) {
+                document.getElementById('bird-img').style.display = 'none';
+                document.getElementById('bird-img').src = '';
+                document.getElementById('bird-loc').innerText = '';
+                document.getElementById('password-lock').style.display = 'block';
+            } else {
+                document.getElementById('bird-img').style.display = 'block';
+                document.getElementById('bird-img').src = currentBird.img;
+                document.getElementById('bird-loc').innerText = currentBird.loc;
+                document.getElementById('password-lock').style.display = 'none';
+            }
+
+            document.getElementById('bird-name').innerText = currentBird.name;
+            document.getElementById('bird-desc').innerText = currentBird.desc;
+            document.getElementById('like-count').innerText = currentBird.likes_count;
             const heart = document.getElementById('heart-icon');
             if (birds[currentIndex].is_liked) {
                 heart.classList.add('liked');
             } else {
                 heart.classList.remove('liked');
             }
+        }
+
+        function unlockPost(event){
+            event.stopPropagation();
+            const currentBird = birds[currentIndex];
+            const passInput = document.querySelector('#password-lock input[name="password"]');
+            const passwordValue = passInput ? passInput.value : '';
+
+            if (!passwordValue.trim()) {
+                alert("Please enter the password");
+                return;
+            }
+            const formData = new FormData();
+            formData.append('password', passwordValue);
+            fetch(`/unlock/${currentBird.id}`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    alert("Incorrect password");
+                    return null;
+                }
+                if (!response.ok) {
+                    throw new Error("Server error: " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
+                currentBird.img = data.img;
+                currentBird.loc = data.loc;
+                currentBird.has_password = false;
+                document.getElementById('bird-img').src = data.img;
+                document.getElementById('bird-img').style.display = 'block';
+                document.getElementById('bird-loc').innerText = data.loc;
+
+                document.getElementById('password-lock').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Server error: check the Flask terminal! Details: " + error.message);
+            });
         }
 
         function toggleLike(event) {

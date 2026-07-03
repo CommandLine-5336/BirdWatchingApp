@@ -14,7 +14,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     login = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(250), nullable=False)
+    password = db.Column(db.String(250), nullable=True)
 
     posts = db.relationship("Post", backref="author", lazy=True)
     likes = db.relationship(
