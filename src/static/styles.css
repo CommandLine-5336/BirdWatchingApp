@@ -51,21 +51,21 @@ input::placeholder {
     transition: all 0.2s ease;
 }
 
-.btn-login { 
-    background: #111; 
-    color: #fff; 
+.btn-login {
+    background: #111;
+    color: #fff;
 }
-.btn-login:hover { 
-    background: #333; 
+.btn-login:hover {
+    background: #333;
 }
 
-.btn-register { 
-    background: #111; 
-    color: #fff; 
-    border: 2px solid transparent; 
+.btn-register {
+    background: #111;
+    color: #fff;
+    border: 2px solid transparent;
 }
-.btn-register:hover { 
-    background: #ccc; 
+.btn-register:hover {
+    background: #ccc;
 }
 
 /* --------- Feed Styles --------- */

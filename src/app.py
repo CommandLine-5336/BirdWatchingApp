@@ -1,9 +1,12 @@
 import os
-from flask import Flask
-from models import db
+
 from dotenv import load_dotenv
+from flask import Flask
+
+from models import db
 
 load_dotenv()
+
 
 def create_app():
     app = Flask(__name__)
@@ -34,6 +37,7 @@ def create_app():
         db.create_all()
 
     return app
+
 
 app = create_app()
 
