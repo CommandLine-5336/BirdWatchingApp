@@ -42,4 +42,3 @@ class Like(db.Model):
     __table_args__ = (
         db.UniqueConstraint("user_id", "post_id", name="unique_user_post_like"),
     )
-    #

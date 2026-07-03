@@ -2,7 +2,6 @@ import os
 import uuid
 
 import boto3
-import botocore
 from botocore.client import Config
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
@@ -49,4 +48,3 @@ def get_file_url(filename):
     except ClientError as e:
         print(f"Presigned URL Error: {e}")
         return ""
-    #
