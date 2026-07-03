@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bird Feed</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
+</head>
+<body onclick="if(!event.target.closest('button') && !event.target.closest('a') && !event.target.closest('.upload-content')) nextBird()">
+    <a href="/logout" class="logout-btn">Logout ({{ username }})</a>
+    <div id="feed">
+        <div class="post">
+            {% if birds_data and birds_data[0].img %}
+                <img id="bird-img" class="post-img" src="{{ birds_data[0].img }}" alt="Bird" loading="lazy">
+                <div class="info">
+                   <div id="bird-name" class="title">{{ birds_data[0].name }}</div>
+                   <div id="bird-desc" class="desc">{{ birds_data[0].desc }}</div>
+                   <span id="bird-loc" class="loc">{{ birds_data[0].loc }}</span>
+
+                   <div class="post-actions" style="margin-top: 10px;">
+                    <button onclick="toggleLike(event)" class="btn like-button" style="z-index: 10;">
+                        <svg id="heart-icon" class="heart-icon{% if birds_data[0].is_liked %} liked{% endif %}" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span id="like-count" style="font-weight: bold;">{{ birds_data[0].likes_count }}</span>
+                    </button>
+                   </div>
+                </div>
+            {% else %}
+                <div class="info">
+                    <div class="title">No birds yet!</div>
+                    <div class="desc">Please upload your first bird.</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="add-btn" onclick="toggleModal(true)">+</div>
+
+    <div class="upload-modal" id="upload-modal">
+        <div class="upload-content">
+            <span class="close-btn" onclick="toggleModal(false)">&times;</span>
+            <h3>New Post</h3>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="input-label">Upload Photo</label>
+                    <label class="custom-file-upload">
+                        <input type="file" name="photo" id="photo-upload" required>
+                        <span id="file-name-display">Select an image...</span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Bird Name</label>
+                    <input type="text" name="title" placeholder="e.g. Barn Owl" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Location</label>
+                    <input type="text" name="location" placeholder="e.g. Central Park" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Description</label>
+                    <input type="text" name="description" placeholder="A short description...">
+                </div>
+
+                <div class="form-group">
+                    <label class="input-label">Password</label>
+                    <input type="text" name="password" placeholder="Password">
+                </div>
+
+                <button type="submit" class="btn btn-login">Publish</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const birds = {{ birds_data | tojson | safe }};
+        let currentIndex = 0;
+
+        function nextBird() {
+            if (birds.length <= 1) return;
+            currentIndex = (currentIndex + 1) % birds.length;
+            document.getElementById('bird-img').src = birds[currentIndex].img;
+            document.getElementById('bird-name').innerText = birds[currentIndex].name;
+            document.getElementById('bird-desc').innerText = birds[currentIndex].desc;
+            document.getElementById('bird-loc').innerText = birds[currentIndex].loc;
+
+            document.getElementById('like-count').innerText = birds[currentIndex].likes_count;
+            const heart = document.getElementById('heart-icon');
+            if (birds[currentIndex].is_liked) {
+                heart.classList.add('liked');
+            } else {
+                heart.classList.remove('liked');
+            }
+        }
+
+        function toggleLike(event) {
+            event.stopPropagation();
+            const currentBird = birds[currentIndex];
+            if (!currentBird || currentBird.id === 0) return;
+
+            fetch(`/like/${currentBird.id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    alert("Please login to like posts.");
+                    return null;
+                }
+                if (!response.ok) {
+                    throw new Error("HTTP Status " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data) return;
+
+                document.getElementById('like-count').innerText = data.likes_count;
+                const heart = document.getElementById('heart-icon');
+                if (data.action === 'liked') {
+                    heart.classList.add('liked')
+                } else {
+                    heart.classList.remove('liked');
+                }
+                birds[currentIndex].likes_count = data.likes_count;
+                birds[currentIndex].is_liked = (data.action === 'liked');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Server error: check the Flask terminal! Details: " + error.message);
+            });
+        }
+
+        function toggleModal(show) {
+            const modal = document.getElementById('upload-modal');
+            if (show) modal.classList.add('active');
+            else modal.classList.remove('active');
+        }
+
+        document.getElementById('photo-upload').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Select an image...';
+            document.getElementById('file-name-display').textContent = fileName;
+        });
+    </script>
+</body>
+</html>
