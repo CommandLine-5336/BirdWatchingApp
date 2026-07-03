@@ -9,10 +9,10 @@ from flask import (
     session,
     url_for,
 )
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from models import Like, Post, db
 from services.storage import get_file_url, upload_to_seaweed
-from werkzeug.security import check_password_hash, generate_password_hash
 
 feed_bp = Blueprint("feed", __name__)
 
