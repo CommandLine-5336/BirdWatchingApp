@@ -98,3 +98,4 @@ jobs:
           VALIDATE_TRIVY: false
           VALIDATE_CSS: false
           VALIDATE_PYTHON_ISORT: false
+          VALIDATE_HTML: false

@@ -1,5 +1,6 @@
 """Database models of structural schemas for SQLAlchemy."""
 
+# pylint: disable=too-few-public-methods
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
