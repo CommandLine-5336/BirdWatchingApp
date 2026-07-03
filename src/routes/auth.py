@@ -20,7 +20,7 @@ def index():
         if action == "register":
             return _handle_registration(form_username, password)
 
-        elif action == "login":
+        if action == "login":
             return _handle_login(form_username, password)
 
     return render_template("auth.html", error=error)
@@ -37,8 +37,7 @@ def _handle_registration(form_username, password):
         session["user_id"] = new_user.id
         session["username"] = new_user.login
         return redirect(url_for("feed.show_feed"))
-    else:
-        return render_template("auth.html", error="Username already taken!")
+    return render_template("auth.html", error="Username already taken!")
 
 
 def _handle_login(form_username, password):
@@ -47,8 +46,7 @@ def _handle_login(form_username, password):
         session["user_id"] = user.id
         session["username"] = user.login
         return redirect(url_for("feed.show_feed"))
-    else:
-        return render_template("auth.html", error="Invalid username or password")
+    return render_template("auth.html", error="Invalid username or password")
 
 
 @auth_bp.route("/logout")
