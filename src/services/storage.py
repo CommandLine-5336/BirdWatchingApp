@@ -1,3 +1,5 @@
+"""Module handling interactions with images storage."""
+
 import os
 import uuid
 
@@ -10,6 +12,7 @@ load_dotenv()
 
 
 def get_s3_client():
+    """Initialize and return a configured boto3 S3 client connection."""
     return boto3.client(
         "s3",
         endpoint_url=os.getenv("S3_ENDPOINT"),
@@ -21,6 +24,7 @@ def get_s3_client():
 
 
 def upload_to_seaweed(file_stream, filename):
+    """Upload a raw binary file stream to the configured S3 storage bucket."""
     s3 = get_s3_client()
     bucket = os.getenv("S3_BUCKET")
 
@@ -36,6 +40,7 @@ def upload_to_seaweed(file_stream, filename):
 
 
 def get_file_url(filename):
+    """Generate a temporary presigned download link for an unauthenticated user asset."""
     if not filename:
         return ""
     s3 = get_s3_client()

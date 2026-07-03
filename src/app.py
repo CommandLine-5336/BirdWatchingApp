@@ -1,14 +1,19 @@
+"""Script that boots the Flask application."""
+
 import os
 
 from dotenv import load_dotenv
 from flask import Flask
 
 from models import db
+from routes.auth import auth_bp
+from routes.feed import feed_bp
 
 load_dotenv()
 
 
 def create_app():
+    """Application factory establishing databases, configurations, and blueprints."""
     application = Flask(__name__)
     application.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "default_dev_key")
 
@@ -28,9 +33,6 @@ def create_app():
     os.makedirs(application.config["UPLOAD_FOLDER"], exist_ok=True)
 
     db.init_app(application)
-
-    from routes.auth import auth_bp
-    from routes.feed import feed_bp
 
     application.register_blueprint(auth_bp)
     application.register_blueprint(feed_bp)

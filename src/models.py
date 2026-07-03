@@ -1,11 +1,14 @@
-from datetime import datetime
+"""Database models of structural schemas for SQLAlchemy."""
 
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 
 class User(db.Model):
+    """Database table user."""
+
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -19,6 +22,8 @@ class User(db.Model):
 
 
 class Post(db.Model):
+    """Database table post."""
+
     __tablename__ = "post"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -34,6 +39,8 @@ class Post(db.Model):
 
 
 class Like(db.Model):
+    """Database table like."""
+
     __tablename__ = "like"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"))

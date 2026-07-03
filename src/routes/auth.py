@@ -1,3 +1,5 @@
+"""Blueprint router containing registration and authentication functions."""
+
 from flask import Blueprint, redirect, render_template, request, session, url_for
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -8,6 +10,7 @@ auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def index():
+    """Redirect to lofins and registrations."""
     error = None
     if request.method == "POST":
         form_username = request.form.get("username")
@@ -27,6 +30,7 @@ def index():
 
 
 def _handle_registration(form_username, password):
+    """Registration."""
     existing_user = User.query.filter_by(login=form_username).first()
     if not existing_user:
         hash_pw = generate_password_hash(password)
@@ -41,6 +45,7 @@ def _handle_registration(form_username, password):
 
 
 def _handle_login(form_username, password):
+    """Login."""
     user = User.query.filter_by(login=form_username).first()
     if user and check_password_hash(user.password, password):
         session["user_id"] = user.id
@@ -51,5 +56,6 @@ def _handle_login(form_username, password):
 
 @auth_bp.route("/logout")
 def logout():
+    """Logout."""
     session.clear()
     return redirect(url_for("auth.index"))

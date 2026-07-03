@@ -1,4 +1,4 @@
-import os
+"""Routers for posts feed, like and upload."""
 
 from flask import (
     Blueprint,
@@ -18,6 +18,7 @@ feed_bp = Blueprint("feed", __name__)
 
 @feed_bp.route("/")
 def show_feed():
+    """Show feed."""
     posts = Post.query.order_by(Post.created_at.desc()).all()
     birds_data = []
     user_id = session.get("user_id")
@@ -62,6 +63,7 @@ def show_feed():
 
 @feed_bp.route("/like/<int:post_id>", methods=["POST"])
 def toggle_like(post_id):
+    """Like."""
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
     user_id = session["user_id"]
@@ -83,6 +85,7 @@ def toggle_like(post_id):
 
 @feed_bp.route("/upload", methods=["POST"])
 def upload():
+    """New posts."""
     if "user_id" not in session:
         return redirect(url_for("auth.index"))
 
@@ -103,6 +106,3 @@ def upload():
     db.session.commit()
 
     return redirect(url_for("feed.show_feed"))
-
-
-#
