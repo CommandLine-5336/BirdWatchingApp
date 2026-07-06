@@ -32,6 +32,7 @@ class Post(db.Model):
     location = db.Column(db.String(100))
     image_filename = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(250))
+    password = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"))
     likes = db.relationship(
