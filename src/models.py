@@ -14,7 +14,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     login = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(250), nullable=False)
+    password = db.Column(db.String(250), nullable=True)
 
     posts = db.relationship("Post", backref="author", lazy=True)
     likes = db.relationship(
@@ -32,6 +32,7 @@ class Post(db.Model):
     location = db.Column(db.String(100))
     image_filename = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(250))
+    password = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"))
     likes = db.relationship(
