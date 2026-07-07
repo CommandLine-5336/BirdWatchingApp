@@ -109,7 +109,7 @@ def upload():
     post_password = (
         password_input.strip() if password_input and password_input.strip() else None
     )
-    hash_pw = generate_password_hash(post_password)
+    hash_pw = generate_password_hash(post_password) if post_password else None
 
     new_post = Post(
         title=request.form.get("title"),
