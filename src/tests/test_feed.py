@@ -13,7 +13,7 @@ def test_feed_empty(client):
     assert b"No posts yet" in response.data
 
 
-def test_upload_unathorized(client):
+def test_upload_unauthorized(client):
     """Check restricted access to upload."""
     response = client.post("/upload", follow_redirects=True)
     assert response.request.path == "/login"
@@ -50,9 +50,9 @@ def test_like_unauthorized(client, db_session, test_user):
     post = Post(title="Test Post", image_filename="img.jpg", user_id=test_user.id)
     db_session.app(post)
     db_session.flush()
-    responce = client.post(f"/like/{post.id}")
-    assert responce.status_code == 401
-    assert responce.json["error"] == "Unathorized"
+    response = client.post(f"/like/{post.id}")
+    assert response.status_code == 401
+    assert response.json["error"] == "Unathorized"
 
 
 def test_toggle_like(client, db_session, test_user):

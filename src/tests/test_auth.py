@@ -1,4 +1,4 @@
-"""Tests for authentification routes."""
+"""Tests for authentication routes."""
 
 from models import User
 
@@ -48,7 +48,7 @@ def test_register_duplicate_user(client, test_user):
             "password": "some_new_password",
         },
     )
-    assert b"Username already teken!" in response.data
+    assert b"Username already taken!" in response.data
 
 
 def test_login_success(client, test_user):
@@ -64,7 +64,7 @@ def test_login_success(client, test_user):
 
 
 def test_login_invalid_password(client, test_user):
-    """Test login with wrong password"""
+    """Test login with wrong password."""
     response = client.post(
         "login",
         data={
@@ -73,7 +73,7 @@ def test_login_invalid_password(client, test_user):
             "password": "wrong_password",
         },
     )
-    assert b"Invalid username or password" in response.data
+    assert b"Invalid username or password." in response.data
 
 
 def test_logout(client, test_user):

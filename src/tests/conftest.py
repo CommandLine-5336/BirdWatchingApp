@@ -1,4 +1,5 @@
 """Module for testing BirdWatchingApp."""
+# pylint: disable=redefined-outer-name, wrong-import-position
 
 import os
 import sys
@@ -41,7 +42,7 @@ def client(test_app):
 @pytest.fixture
 def db_session(test_app):
     """Provides session DB for tests."""
-    with test_app.app_conteext():
+    with test_app.app_context():
         yield db.session
 
 
