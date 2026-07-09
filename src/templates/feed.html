@@ -5,7 +5,7 @@
     <title>Bird Feed</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
 </head>
-<body onclick="if(!event.target.closest('button') && !event.target.closest('a') && !event.target.closest('.upload-content')) nextBird()">
+<body onclick="if(!event.target.closest('button') && !event.target.closest('a') && !event.target.closest('.upload-content') && !event.target.closest('input')) nextBird()">
     <a href="/logout" class="logout-btn">Logout ({{ username }})</a>
     <div id="feed">
         <div class="post">
@@ -18,7 +18,7 @@
                     <p>Please enter the password to see the photo and location:</p>
                     <div class="form-group">
                         <label class="input-label">Password (optional)</label>
-                        <input type="text" name="password" placeholder="Password">
+                        <input type="password" id="unlock-password" name="password" placeholder="Password" onclick="event.stopPropagation()">
                     </div>
 
                     <button type="button" onclick="unlockPost(event)" class="btn">Unblock</button>
@@ -122,7 +122,7 @@
         function unlockPost(event){
             event.stopPropagation();
             const currentBird = birds[currentIndex];
-            const passInput = document.querySelector('#password-lock input[name="password"]');
+            const passInput = document.getElementById('unlock-password');
             const passwordValue = passInput ? passInput.value : '';
 
             if (!passwordValue.trim()) {
