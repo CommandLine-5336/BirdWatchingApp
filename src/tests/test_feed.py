@@ -48,11 +48,11 @@ def test_upload_post(mock_upload, _mock_get, client, db_session, test_user):
 def test_like_unauthorized(client, db_session, test_user):
     """Test like functionality without auth."""
     post = Post(title="Test Post", image_filename="img.jpg", user_id=test_user.id)
-    db_session.app(post)
+    db_session.add(post)
     db_session.flush()
     response = client.post(f"/like/{post.id}")
     assert response.status_code == 401
-    assert response.json["error"] == "Unathorized"
+    assert response.json["error"] == "Unauthorized"
 
 
 def test_toggle_like(client, db_session, test_user):
@@ -63,7 +63,7 @@ def test_toggle_like(client, db_session, test_user):
     post_id = post.id
 
     with client.session_transaction() as session:
-        session["user.id"] = test_user.id
+        session["user_id"] = test_user.id
 
         response = client.post(f"/like/{post_id}")
         assert response.status_code == 200
@@ -97,4 +97,3 @@ def test_unlocking_post(_mock_get, client, db_session, test_user):
     )
     assert response_success.status_code == 200
     assert response_success.json["success"] is True
-    assert response_success.json["error"] == "Incorrect password"

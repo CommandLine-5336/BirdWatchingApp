@@ -1,4 +1,5 @@
 """Module for testing BirdWatchingApp."""
+
 # pylint: disable=redefined-outer-name, wrong-import-position
 
 import os
