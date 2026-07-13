@@ -67,7 +67,10 @@ def show_feed():
             }
         ]
     return render_template(
-        "feed.html", birds_data=birds_data, username=session.get("login", "User")
+        "feed.html",
+        birds_data=birds_data,
+        username=session.get("username", "User"),
+        logged_in="user_id" in session,
     )
 
 

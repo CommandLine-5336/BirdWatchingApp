@@ -6,7 +6,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
 </head>
 <body onclick="if(!event.target.closest('button') && !event.target.closest('a') && !event.target.closest('.upload-content') && !event.target.closest('input')) nextBird()">
-    <a href="/logout" class="logout-btn">Logout ({{ username }})</a>
+    {% if logged_in %}
+        <a href="/logout" class="logout-btn">Logout ({{ username }})</a>
+    {% else %}
+        <a href="/login" class="logout-btn">Login</a>
+    {% endif %}
     <div id="feed">
         <div class="post">
             {% if birds_data %}
