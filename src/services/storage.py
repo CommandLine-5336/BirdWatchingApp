@@ -3,7 +3,24 @@
 import os
 import uuid
 
+import boto3
+from botocore.client import Config
+from dotenv import load_dotenv
 from flask import current_app, url_for
+
+load_dotenv()
+
+def get_s3_client():
+    """Initialize and return a configured boto3 S3 client connection."""
+    return boto3.client(
+        "s3",
+        region_name=os.getenv("S3_REGION"),
+        # endpoint_url=os.getenv("S3_ENDPOINT"),
+        # aws_access_key_id=os.getenv("S3_ACCESS_KEY"),
+        # aws_secret_access_key=os.getenv("S3_SECRET_KEY"),
+        config=Config(s3={"addressing_style": "path"}, signature_version="s3v4"),
+        use_ssl=False,
+    )
 
 
 def upload_to_seaweed(file_stream, filename):
