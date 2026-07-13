@@ -1,40 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    font-family: 'Inter', 'sans-serif';
-    overflow-x: hidden;
+html, body {
+    margin: 0; padding: 0; width: 100%; height:100vh;
+    background: #f0f4f8; font-family: 'Inter', 'sans-serif';
+    display: flex; justify-content: center; align-items: center;
+    overflow-x: hidden; cursor:pointer;
 }
 
-body.auth-page {
-    background: #f0f4f8;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-}
-
-body.feed-page {
-    background: #f0f4f8;
-    display: block;
-    overflow-y: scroll;
-    scroll-snap-type: y mandatory;
-    scroll-behavior: smooth;
-}
-
+/* --------- Auth Styles --------- */
 .auth-container {
-    width: 90%;
-    max-width: 380px;
-    background: #ffffff;
-    color: #111111;
-    border-radius: 24px;
-    padding: 40px 30px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    text-align: center;
+    width: 90%; max-width:380px; background: #ffffff;
+    color: #111111; border-radius: 24px; padding: 40px 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3); text-align: center;
 }
 
 .auth-container h3 {
@@ -46,25 +23,15 @@ body.feed-page {
 }
 
 .alert {
-    background: #ffe6e6;
-    color: #d93025;
-    border: 2px solid #f5c2c7;
-    padding: 12px;
-    border-radius: 16px;
-    margin-bottom: 20px;
-    font-size: 0.95rem;
-    font-weight: 800;
+    background: #ffe6e6; color: #d93025; border: 2px solid #f5c2c7;
+    padding: 12px; border-radius: 16px; margin-bottom: 20px;
+    font-size: 0.95rem; font-weight: 800;
 }
 
 input {
-    width: 100%;
-    padding: 16px 20px;
-    margin-bottom: 16px;
-    box-sizing: border-box;
-    outline: none;
-    font-family: 'Inter', 'sans-serif';
-    font-size: 1rem;
-    font-weight: 600;
+    width: 100%; padding: 16px 20px; margin-bottom: 16px;
+    box-sizing: border-box; outline:none;
+    font-family: 'Inter', 'sans-serif'; font-size: 1rem; font-weight: 600;
     transition: all 0.2s ease;
 }
 
@@ -79,14 +46,8 @@ input::placeholder {
 }
 
 .btn {
-    width: 100%;
-    padding: 16px;
-    border: none;
-    border-radius: 16px;
-    font-size: 1.1rem;
-    font-weight: 800;
-    cursor: pointer;
-    margin-bottom: 12px;
+    width: 100%; padding: 16px; border: none; border-radius: 16px;
+    font-size: 1.1rem; font-weight: 800; cursor: pointer; margin-bottom: 12px;
     transition: all 0.2s ease;
 }
 
@@ -94,7 +55,6 @@ input::placeholder {
     background: #111;
     color: #fff;
 }
-
 .btn-login:hover {
     background: #333;
 }
@@ -104,116 +64,55 @@ input::placeholder {
     color: #fff;
     border: 2px solid transparent;
 }
-
 .btn-register:hover {
     background: #ccc;
 }
 
+/* --------- Feed Styles --------- */
 #feed {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.post-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
-    padding: 10px 0;
-    box-sizing: border-box;
+    width: 100%; max-width: 500px; display: flex;
+    flex-direction: column; align-items: center;
 }
 
 .post {
-    width: 90%;
-    aspect-ratio: 4/5;
-    border-radius: 24px;
-    overflow: hidden;
-    background: #fff;
-    position: relative;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+    width: 90%; aspect-ratio: 4/5; border-radius: 24px;
+    overflow: hidden; background: #fff; position: relative;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.08);
 }
 
 .post-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.password-lock-form {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    text-align: center;
-    background: #fff;
+    width: 100%; height: 100%; object-fit: cover;
 }
 
 .info {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    right: 20px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(15px);
-    border-radius: 20px;
+    position: absolute; bottom: 20px; left: 20px; right: 20px;
+    padding: 20px; background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(15px); border-radius: 20px; pointer-events: none;
 }
 
 .title {
-    font-size: 1.6rem;
-    font-weight: 900;
-    color: #111;
-    margin-bottom: 5px;
-    letter-spacing: -0.5px;
+    font-size: 1.6rem; font-weight: 900; color: #111;
+    margin-bottom: 5px; letter-spacing: -0.5px;
 }
 
 .desc {
-    font-size: 0.8rem;
-    color: #007aff;
-    font-weight: 800;
-    display: block;
-    margin-top: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 0.8rem; color: #007aff; font-weight: 800;
+    display: block; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;
 }
 
 .logout-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #fff;
-    color: #111;
-    padding: 10px 18px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 800;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    position: absolute; top: 20px; right: 20px; background: #fff;
+    color: #111; padding: 10px 18px; border-radius: 20px;
+    text-decoration: none; font-size: 0.95rem; font-weight: 800;
+    z-index: 1000; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
+/* --------- Modal & Upload Styles --------- */
 .add-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background: #111;
-    color: #fff;
-    border-radius: 50%;
-    font-size: 40px;
-    text-align: center;
-    line-height: 55px;
-    cursor: pointer;
-    z-index: 1000;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease;
+    position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+    background: #111; color: #fff; border-radius: 50%; font-size: 40px;
+    text-align: center; line-height: 55px; cursor: pointer; z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.2s ease;
 }
 
 .add-btn:hover {
@@ -221,16 +120,8 @@ input::placeholder {
 }
 
 .upload-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.95);
-    z-index: 2000;
-    justify-content: center;
-    align-items: center;
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.95); z-index: 2000; justify-content: center; align-items: center;
 }
 
 .upload-modal.active {
@@ -238,33 +129,25 @@ input::placeholder {
 }
 
 .upload-content {
-    width: 90%;
-    max-width: 400px;
-    background: #fff;
-    padding: 30px;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    position: relative;
+    width: 90%; max-width: 400px; background: #fff; padding: 30px;
+    border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative;
 }
 
 .upload-content h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-weight: 900;
+    margin-top: 0; margin-bottom: 20px; font-weight: 900;
 }
 
 .close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    font-weight: bold;
-    color: #555;
+    position: absolute; top: 15px; right: 20px; font-size: 24px;
+    cursor: pointer; font-weight: bold; color: #555;
 }
 
 .close-btn:hover {
     color: #000;
+}
+
+.file-input {
+    border: 1px solid #ccc; padding: 12px; cursor: pointer;
 }
 
 .form-group {
@@ -313,6 +196,20 @@ input[type="file"] {
     margin-bottom: 0;
 }
 
+.btn-publish {
+    background: #f3f4f6;
+    color: #4b5563;
+    border: none;
+    margin-top: 10px;
+}
+
+.btn-publish:hover {
+    background: #e5e7eb;
+    color: #111;
+}
+
+/* --------- LIkes btn --------- */
+
 .post-actions {
     margin-top: 10px;
     pointer-events: auto;
@@ -330,12 +227,6 @@ input[type="file"] {
     padding: 5px 10px;
     border-radius: 20px;
     transition: background-color 0.2s ease;
-}
-
-.like-button.locked {
-    opacity: 0.4;
-    cursor: not-allowed;
-    pointer-events: none;
 }
 
 .like-button:hover {
@@ -360,6 +251,14 @@ input[type="file"] {
     transform: scale(1.1);
 }
 
+/* --------- Like Locking --------- */
+.like-button.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* --------- Scroll Hint --------- */
 .scroll-hint {
     position: fixed;
     bottom: 40px;
@@ -387,13 +286,6 @@ input[type="file"] {
 }
 
 @keyframes scroll-hint-bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(10px);
-    }
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
 }
