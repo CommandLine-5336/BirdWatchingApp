@@ -251,4 +251,41 @@ input[type="file"] {
     transform: scale(1.1);
 }
 
-/*--- ---*/
+/* --------- Like Locking --------- */
+.like-button.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* --------- Scroll Hint --------- */
+.scroll-hint {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #555;
+    font-weight: 800;
+    font-size: 0.85rem;
+    pointer-events: none;
+    z-index: 500;
+    transition: opacity 0.4s ease;
+}
+
+.scroll-hint.hidden {
+    opacity: 0;
+}
+
+.scroll-hint-arrow {
+    font-size: 1.6rem;
+    animation: scroll-hint-bounce 1.4s infinite;
+}
+
+@keyframes scroll-hint-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+}

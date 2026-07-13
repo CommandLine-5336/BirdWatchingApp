@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Bird Feed</title>
+    <title>BirdsWatcher</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
 </head>
 <body onclick="if(!event.target.closest('button') && !event.target.closest('a') && !event.target.closest('.upload-content') && !event.target.closest('input')) nextBird()">
@@ -10,6 +10,10 @@
     <div id="feed">
         <div class="post">
             {% if birds_data %}
+            <div class="scroll-hint" id="scroll-hint">
+                <div class="scroll-hint-arrow">&#8595;</div>
+                <div class="scroll-hint-text">Scroll to see more</div>
+            </div>
                 <img id="bird-img" class="post-img"
                      src="{{ '' if birds_data[0].has_password else birds_data[0].img }}"
                      alt="Bird" loading="lazy"
@@ -30,7 +34,7 @@
                    <span id="bird-loc" class="loc">{{ '' if birds_data[0].has_password else birds_data[0].loc }}</span>
 
                    <div class="post-actions" style="margin-top: 10px;">
-                    <button onclick="toggleLike(event)" class="btn like-button" style="z-index: 10;">
+                    <button onclick="toggleLike(event)" class="btn like-button{% if birds_data[0].has_password %} locked{% endif %}" style="z-index: 10;">
                         <svg id="heart-icon" class="heart-icon{% if birds_data[0].is_liked %} liked{% endif %}" viewBox="0 0 24 24">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
@@ -117,6 +121,10 @@
             } else {
                 heart.classList.remove('liked');
             }
+            const likeBtn = document.querySelector('.like-button');
+            if (likeBtn) {
+                likeBtn.classList.toggle('locked', currentBird.has_password);
+            }
         }
 
         function unlockPost(event){
@@ -155,6 +163,10 @@
                 document.getElementById('bird-loc').innerText = data.loc;
 
                 document.getElementById('password-lock').style.display = 'none';
+                const likeBtn = document.querySelector('.like-button');
+                if (likeBtn) {
+                    likeBtn.classList.remove('locked');
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -164,6 +176,10 @@
 
         function toggleLike(event) {
             event.stopPropagation();
+            const likeBtn = event.currentTarget;
+            if (likeBtn.classList.contains('locked')) {
+                return;
+            }
             const currentBird = birds[currentIndex];
             if (!currentBird || currentBird.id === 0) return;
 
@@ -176,6 +192,10 @@
             .then(response => {
                 if (response.status === 401) {
                     alert("Please login to like posts.");
+                    return null;
+                }
+                if (response.status === 403) {
+                    alert("This post is locked.");
                     return null;
                 }
                 if (!response.ok) {
@@ -212,6 +232,26 @@
             const fileName = e.target.files[0] ? e.target.files[0].name : 'Select an image...';
             document.getElementById('file-name-display').textContent = fileName;
         });
+        const scrollHint = document.getElementById('scroll-hint');
+        if (scrollHint) {
+            if (localStorage.getItem('birdwatcher_scroll_hint_seen')) {
+                scrollHint.classList.add('hidden');
+            } else {
+            let hintDismissed = false;
+            const dismissHint = function () {
+                if (hintDismissed) return;
+                hintDismissed = true;
+                scrollHint.classList.add('hidden');
+                localStorage.setItem('birdwatcher_scroll_hint_seen', 'true');
+                document.body.removeEventListener('scroll', dismissHint);
+                document.body.removeEventListener('click', dismissHint);
+                document.body.removeEventListener('wheel', dismissHint);
+            };
+            document.body.addEventListener('scroll', dismissHint, { passive: true });
+            document.body.addEventListener('click', dismissHint);
+            document.body.addEventListener('wheel', dismissHint, { passive: true });
+            }
+        }
     </script>
 </body>
 </html>
