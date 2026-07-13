@@ -1,10 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
 
 html, body {
-    margin: 0; padding: 0; width: 100%; height:100vh;
+    margin: 0; padding: 0; width: 100%; height: 100vh;
     background: #f0f4f8; font-family: 'Inter', 'sans-serif';
-    display: flex; justify-content: center; align-items: center;
-    overflow-x: hidden; cursor:pointer;
+    overflow-x: hidden;
+}
+
+body.feed-page {
+    display: block;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
 }
 
 /* --------- Auth Styles --------- */
@@ -70,8 +76,20 @@ input::placeholder {
 
 /* --------- Feed Styles --------- */
 #feed {
-    width: 100%; max-width: 500px; display: flex;
-    flex-direction: column; align-items: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.post-wrapper {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
 }
 
 .post {

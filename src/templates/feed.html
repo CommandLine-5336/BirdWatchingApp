@@ -256,6 +256,31 @@
             document.body.addEventListener('wheel', dismissHint, { passive: true });
             }
         }
+        let scrollThrottle = false;
+
+        window.addEventListener('wheel', function(event) {
+            if (scrollThrottle) return;
+            if (event.deltaY > 0) { 
+                nextBird();
+                scrollThrottle = true;
+                setTimeout(() => scrollThrottle = false, 600); 
+                }
+        }, { passive: true });
+
+        let touchStartY = 0;
+        window.addEventListener('touchstart', function(event) {
+            touchStartY = event.changedTouches[0].screenY;
+        }, { passive: true });
+
+        window.addEventListener('touchend', function(event) {
+            if (scrollThrottle) return;
+            let touchEndY = event.changedTouches[0].screenY;
+            if (touchStartY - touchEndY > 50) { 
+                nextBird();
+                scrollThrottle = true;
+                setTimeout(() => scrollThrottle = false, 600);
+            }
+        }, { passive: true });
     </script>
 </body>
 </html>
