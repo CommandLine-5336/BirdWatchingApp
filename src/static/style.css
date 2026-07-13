@@ -6,6 +6,12 @@ html, body {
     overflow-x: hidden;
 }
 
+body.auth-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 body.feed-page {
     display: block;
     overflow-y: scroll;
@@ -77,6 +83,8 @@ input::placeholder {
 /* --------- Feed Styles --------- */
 #feed {
     width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;

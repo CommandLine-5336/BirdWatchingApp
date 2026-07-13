@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>BirdsWatcher | Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
+
+<body class="auth-page">
     <div class="auth-container">
         <h3>BirdTok</h3>
         {% if error %}<div class="alert">{{ error }}</div>{% endif %}
@@ -17,4 +19,5 @@
         </form>
     </div>
 </body>
+
 </html>

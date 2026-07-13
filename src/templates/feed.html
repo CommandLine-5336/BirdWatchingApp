@@ -1,59 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>BirdsWatcher</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2">
+    <title>BirdsWatching</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=3">
 </head>
-<body onclick="if(!event.target.closest('button') && !event.target.closest('a') && !event.target.closest('.upload-content') && !event.target.closest('input')) nextBird()">
+
+<body class="feed-page">
     {% if logged_in %}
-        <a href="/logout" class="logout-btn">Logout ({{ username }})</a>
+    <a href="/logout" class="logout-btn">Logout ({{ username }})</a>
     {% else %}
-        <a href="/login" class="logout-btn">Login</a>
+    <a href="/login" class="logout-btn">Login</a>
     {% endif %}
+
     <div id="feed">
-        <div class="post">
-            {% if birds_data %}
-            <div class="scroll-hint" id="scroll-hint">
-                <div class="scroll-hint-arrow">&#8595;</div>
-                <div class="scroll-hint-text">Scroll to see more</div>
-            </div>
-                <img id="bird-img" class="post-img"
-                     src="{{ '' if birds_data[0].has_password else birds_data[0].img }}"
-                     alt="Bird" loading="lazy"
-                     style="{{ 'display:none;' if birds_data[0].has_password else '' }}">
-                <div id="password-lock" class="password-lock-form" style="{{ 'display:block;' if birds_data[0].has_password else 'display:none;' }} margin: 20px; text-align: center;">
+        {% for bird in birds_data %}
+        <div class="post-wrapper">
+            <div class="post">
+                <img id="bird-img-{{ bird.id }}" class="post-img" src="{{ '' if bird.has_password else bird.img }}"
+                    alt="Bird" loading="lazy" style="{{ 'display:none;' if bird.has_password else '' }}">
+
+                <div id="password-lock-{{ bird.id }}" class="password-lock-form"
+                    style="{{ 'display:block;' if bird.has_password else 'display:none;' }} margin: 20px; text-align: center;">
                     <p>Please enter the password to see the photo and location:</p>
                     <div class="form-group">
                         <label class="input-label">Password (optional)</label>
-                        <input type="password" id="unlock-password" name="password" placeholder="Password" onclick="event.stopPropagation()">
+                        <input type="password" id="unlock-password-{{ bird.id }}" name="password" placeholder="Password"
+                            onclick="event.stopPropagation()">
                     </div>
-
-                    <button type="button" onclick="unlockPost(event)" class="btn">Unblock</button>
+                    <button type="button" onclick="unlockPost(event, {{ bird.id }})" class="btn">Unblock</button>
                 </div>
 
                 <div class="info">
-                   <div id="bird-name" class="title">{{ birds_data[0].name }}</div>
-                   <div id="bird-desc" class="desc">{{ birds_data[0].desc }}</div>
-                   <span id="bird-loc" class="loc">{{ '' if birds_data[0].has_password else birds_data[0].loc }}</span>
+                    <div class="title">{{ bird.name }}</div>
+                    <div class="desc">{{ bird.desc }}</div>
+                    <span id="bird-loc-{{ bird.id }}" class="loc">{{ '' if bird.has_password else bird.loc }}</span>
 
-                   <div class="post-actions" style="margin-top: 10px;">
-                    <button onclick="toggleLike(event)" class="btn like-button{% if birds_data[0].has_password %} locked{% endif %}" style="z-index: 10;">
-                        <svg id="heart-icon" class="heart-icon{% if birds_data[0].is_liked %} liked{% endif %}" viewBox="0 0 24 24">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        <span id="like-count" style="font-weight: bold;">{{ birds_data[0].likes_count }}</span>
-                    </button>
-                   </div>
+                    <div class="post-actions" style="margin-top: 10px;">
+                        <button onclick="toggleLike(event, {{ bird.id }})"
+                            class="btn like-button{% if bird.has_password %} locked{% endif %}"
+                            id="like-btn-{{ bird.id }}" style="z-index: 10;">
+                            <svg id="heart-icon-{{ bird.id }}" class="heart-icon{% if bird.is_liked %} liked{% endif %}"
+                                viewBox="0 0 24 24">
+                                <path
+                                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                            </svg>
+                            <span id="like-count-{{ bird.id }}" style="font-weight: bold;">{{ bird.likes_count }}</span>
+                        </button>
+                    </div>
                 </div>
-            {% else %}
-                <div class="info">
-                    <div class="title">No birds yet!</div>
-                    <div class="desc">Please upload your first bird.</div>
-                </div>
-            {% endif %}
+            </div>
         </div>
+        {% endfor %}
     </div>
+
+    {% if birds_data %}
+    <div class="scroll-hint" id="scroll-hint">
+        <div class="scroll-hint-arrow">&#8595;</div>
+        <div class="scroll-hint-text">Scroll to see more</div>
+    </div>
+    {% endif %}
 
     <div class="add-btn" onclick="toggleModal(true)">+</div>
 
@@ -69,72 +76,31 @@
                         <span id="file-name-display">Select an image...</span>
                     </label>
                 </div>
-
                 <div class="form-group">
                     <label class="input-label">Bird Name</label>
                     <input type="text" name="title" placeholder="e.g. Barn Owl" required>
                 </div>
-
                 <div class="form-group">
                     <label class="input-label">Location</label>
                     <input type="text" name="location" placeholder="e.g. Central Park" required>
                 </div>
-
                 <div class="form-group">
                     <label class="input-label">Description</label>
                     <input type="text" name="description" placeholder="A short description...">
                 </div>
-
                 <div class="form-group">
                     <label class="input-label">Password</label>
                     <input type="text" name="password" placeholder="Password">
                 </div>
-
                 <button type="submit" class="btn btn-login">Publish</button>
             </form>
         </div>
     </div>
+
     <script>
-        const birds = {{ birds_data | tojson | safe }};
-        let currentIndex = 0;
-
-        function nextBird() {
-            if (birds.length <= 1) return;
-            currentIndex = (currentIndex + 1) % birds.length;
-            const currentBird = birds[currentIndex];
-            document.getElementById('unlock-password').value = '';
-
-            if (currentBird.has_password) {
-                document.getElementById('bird-img').style.display = 'none';
-                document.getElementById('bird-img').src = '';
-                document.getElementById('bird-loc').innerText = '';
-                document.getElementById('password-lock').style.display = 'block';
-            } else {
-                document.getElementById('bird-img').style.display = 'block';
-                document.getElementById('bird-img').src = currentBird.img;
-                document.getElementById('bird-loc').innerText = currentBird.loc;
-                document.getElementById('password-lock').style.display = 'none';
-            }
-
-            document.getElementById('bird-name').innerText = currentBird.name;
-            document.getElementById('bird-desc').innerText = currentBird.desc;
-            document.getElementById('like-count').innerText = currentBird.likes_count;
-            const heart = document.getElementById('heart-icon');
-            if (birds[currentIndex].is_liked) {
-                heart.classList.add('liked');
-            } else {
-                heart.classList.remove('liked');
-            }
-            const likeBtn = document.querySelector('.like-button');
-            if (likeBtn) {
-                likeBtn.classList.toggle('locked', currentBird.has_password);
-            }
-        }
-
-        function unlockPost(event){
+        function unlockPost(event, postId) {
             event.stopPropagation();
-            const currentBird = birds[currentIndex];
-            const passInput = document.getElementById('unlock-password');
+            const passInput = document.getElementById(`unlock-password-${postId}`);
             const passwordValue = passInput ? passInput.value : '';
 
             if (!passwordValue.trim()) {
@@ -143,87 +109,78 @@
             }
             const formData = new FormData();
             formData.append('password', passwordValue);
-            fetch(`/unlock/${currentBird.id}`, {
+            fetch(`/unlock/${postId}`, {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
-                if (response.status === 401) {
-                    alert("Incorrect password");
-                    return null;
-                }
-                if (!response.ok) {
-                    throw new Error("Server error: " + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data) return;
-                currentBird.img = data.img;
-                currentBird.loc = data.loc;
-                currentBird.has_password = false;
-                document.getElementById('bird-img').src = data.img;
-                document.getElementById('bird-img').style.display = 'block';
-                document.getElementById('bird-loc').innerText = data.loc;
+                .then(response => {
+                    if (response.status === 401) {
+                        alert("Incorrect password");
+                        return null;
+                    }
+                    if (!response.ok) {
+                        throw new Error("Server error: " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) return;
+                    document.getElementById(`bird-img-${postId}`).src = data.img;
+                    document.getElementById(`bird-img-${postId}`).style.display = 'block';
+                    document.getElementById(`bird-loc-${postId}`).innerText = data.loc;
+                    document.getElementById(`password-lock-${postId}`).style.display = 'none';
 
-                document.getElementById('password-lock').style.display = 'none';
-                const likeBtn = document.querySelector('.like-button');
-                if (likeBtn) {
-                    likeBtn.classList.remove('locked');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Server error: check the Flask terminal! Details: " + error.message);
-            });
+                    const likeBtn = document.getElementById(`like-btn-${postId}`);
+                    if (likeBtn) {
+                        likeBtn.classList.remove('locked');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Server error: check the Flask terminal! Details: " + error.message);
+                });
         }
 
-        function toggleLike(event) {
+        function toggleLike(event, postId) {
             event.stopPropagation();
             const likeBtn = event.currentTarget;
             if (likeBtn.classList.contains('locked')) {
                 return;
             }
-            const currentBird = birds[currentIndex];
-            if (!currentBird || currentBird.id === 0) return;
+            if (!postId) return;
 
-            fetch(`/like/${currentBird.id}`, {
+            fetch(`/like/${postId}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: { 'Content-Type': 'application/json' }
             })
-            .then(response => {
-                if (response.status === 401) {
-                    alert("Please login to like posts.");
-                    return null;
-                }
-                if (response.status === 403) {
-                    alert("This post is locked.");
-                    return null;
-                }
-                if (!response.ok) {
-                    throw new Error("HTTP Status " + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (!data) return;
-
-                document.getElementById('like-count').innerText = data.likes_count;
-                const heart = document.getElementById('heart-icon');
-                if (data.action === 'liked') {
-                    heart.classList.add('liked')
-                } else {
-                    heart.classList.remove('liked');
-                }
-                birds[currentIndex].likes_count = data.likes_count;
-                birds[currentIndex].is_liked = (data.action === 'liked');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Server error: check the Flask terminal! Details: " + error.message);
-            });
+                .then(response => {
+                    if (response.status === 401) {
+                        alert("Please login to like posts.");
+                        return null;
+                    }
+                    if (response.status === 403) {
+                        alert("This post is locked.");
+                        return null;
+                    }
+                    if (!response.ok) {
+                        throw new Error("HTTP Status " + response.status);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data) return;
+                    document.getElementById(`like-count-${postId}`).innerText = data.likes_count;
+                    const heart = document.getElementById(`heart-icon-${postId}`);
+                    if (data.action === 'liked') {
+                        heart.classList.add('liked');
+                    } else {
+                        heart.classList.remove('liked');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("Server error: check the Flask terminal! Details: " + error.message);
+                });
         }
 
         function toggleModal(show) {
@@ -232,55 +189,32 @@
             else modal.classList.remove('active');
         }
 
-        document.getElementById('photo-upload').addEventListener('change', function(e) {
+        document.getElementById('photo-upload').addEventListener('change', function (e) {
             const fileName = e.target.files[0] ? e.target.files[0].name : 'Select an image...';
             document.getElementById('file-name-display').textContent = fileName;
         });
+
         const scrollHint = document.getElementById('scroll-hint');
         if (scrollHint) {
             if (localStorage.getItem('birdwatcher_scroll_hint_seen')) {
                 scrollHint.classList.add('hidden');
             } else {
-            let hintDismissed = false;
-            const dismissHint = function () {
-                if (hintDismissed) return;
-                hintDismissed = true;
-                scrollHint.classList.add('hidden');
-                localStorage.setItem('birdwatcher_scroll_hint_seen', 'true');
-                document.body.removeEventListener('scroll', dismissHint);
-                document.body.removeEventListener('click', dismissHint);
-                document.body.removeEventListener('wheel', dismissHint);
-            };
-            document.body.addEventListener('scroll', dismissHint, { passive: true });
-            document.body.addEventListener('click', dismissHint);
-            document.body.addEventListener('wheel', dismissHint, { passive: true });
+                let hintDismissed = false;
+                const dismissHint = function () {
+                    if (hintDismissed) return;
+                    hintDismissed = true;
+                    scrollHint.classList.add('hidden');
+                    localStorage.setItem('birdwatcher_scroll_hint_seen', 'true');
+                    document.body.removeEventListener('scroll', dismissHint);
+                    document.body.removeEventListener('wheel', dismissHint);
+                    document.body.removeEventListener('touchmove', dismissHint);
+                };
+                document.body.addEventListener('scroll', dismissHint, { passive: true });
+                document.body.addEventListener('wheel', dismissHint, { passive: true });
+                document.body.addEventListener('touchmove', dismissHint, { passive: true });
             }
         }
-        let scrollThrottle = false;
-
-        window.addEventListener('wheel', function(event) {
-            if (scrollThrottle) return;
-            if (event.deltaY > 0) { 
-                nextBird();
-                scrollThrottle = true;
-                setTimeout(() => scrollThrottle = false, 600); 
-                }
-        }, { passive: true });
-
-        let touchStartY = 0;
-        window.addEventListener('touchstart', function(event) {
-            touchStartY = event.changedTouches[0].screenY;
-        }, { passive: true });
-
-        window.addEventListener('touchend', function(event) {
-            if (scrollThrottle) return;
-            let touchEndY = event.changedTouches[0].screenY;
-            if (touchStartY - touchEndY > 50) { 
-                nextBird();
-                scrollThrottle = true;
-                setTimeout(() => scrollThrottle = false, 600);
-            }
-        }, { passive: true });
     </script>
 </body>
+
 </html>
