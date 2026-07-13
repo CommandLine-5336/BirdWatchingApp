@@ -11,32 +11,18 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from models import Like, Post, User, db
+from models import Like, Post, db
 from services.storage import get_file_url, upload_to_seaweed
 
 feed_bp = Blueprint("feed", __name__)
 
 
-def _get_valid_user_id():
-    """Return the session's user_id only if that user still exists in the database."""
-    user_id = session.get("user_id")
-    if not user_id:
-        return None
-    user = User.query.get(user_id)
-    if not user:
-        session.clear()
-        return None
-    return user_id
-
-
 @feed_bp.route("/")
 def show_feed():
     """Show feed."""
-    user_id = _get_valid_user_id()
-    unlocked_posts = session.get("unlocked_posts", [])
-
-    posts = Post.query.order_by(Post.created_at.asc()).all()
+    posts = Post.query.order_by(Post.created_at.desc()).all()
     birds_data = []
+    user_id = session.get("user_id")
     for post in posts:
         likes_count = post.likes.count()
         is_liked = False
@@ -46,7 +32,7 @@ def show_feed():
                 is not None
             )
 
-        has_password = bool(post.password) and post.id not in unlocked_posts
+        has_password = bool(post.password)
         if has_password:
             file_url = ""
             location = ""
@@ -81,25 +67,20 @@ def show_feed():
             }
         ]
     return render_template(
-        "feed.html",
-        birds_data=birds_data,
-        username=session.get("username"),
-        logged_in=bool(user_id),
+        "feed.html", birds_data=birds_data, username=session.get("login", "User")
     )
 
 
 @feed_bp.route("/like/<int:post_id>", methods=["POST"])
 def toggle_like(post_id):
     """Like."""
-    user_id = _get_valid_user_id()
-    if not user_id:
+    if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
-
     post = Post.query.get_or_404(post_id)
     unlocked_posts = session.get("unlocked_posts", [])
     if post.password and post.id not in unlocked_posts:
         return jsonify({"error": "Post is locked"}), 403
-
+    user_id = session["user_id"]
     existing_like = Like.query.filter_by(user_id=user_id, post_id=post_id).first()
 
     if existing_like:
@@ -119,8 +100,7 @@ def toggle_like(post_id):
 @feed_bp.route("/upload", methods=["POST"])
 def upload():
     """New posts."""
-    user_id = _get_valid_user_id()
-    if not user_id:
+    if "user_id" not in session:
         return redirect(url_for("auth.index"))
 
     file = request.files.get("photo")
@@ -128,9 +108,6 @@ def upload():
     if file and file.filename != "":
         file.stream.seek(0)
         object_key = upload_to_seaweed(file.stream, file.filename)
-
-    if not object_key:
-        return "Upload failed: could not save the image file.", 500
 
     password_input = request.form.get("password")
     post_password = (
@@ -143,7 +120,7 @@ def upload():
         location=request.form.get("location"),
         description=request.form.get("description"),
         image_filename=object_key,
-        user_id=user_id,
+        user_id=session["user_id"],
         password=hash_pw,
     )
     db.session.add(new_post)
