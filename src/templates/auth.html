@@ -3,13 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>BirdsWatcher | Login</title>
+    <title>BirdsWatching | Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body class="auth-page">
     <div class="auth-container">
-        <h3>BirdTok</h3>
+        <h3>BirdsWatching</h3>
         {% if error %}<div class="alert">{{ error }}</div>{% endif %}
         <form method="POST">
             <input type="text" name="username" placeholder="Username" required>
