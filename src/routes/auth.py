@@ -10,21 +10,24 @@ auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def index():
-    """Redirect to lofins and registrations."""
+    """Redirect to logins and registrations."""
     error = None
-    if request.method == "POST":
-        form_username = request.form.get("username")
-        password = request.form.get("password")
-        action = request.form.get("action")
+    if request.method == "GET":
+        session.clear()
+        return render_template("auth.html", error=error)
 
-        if not form_username or not password:
-            return render_template("auth.html", error="Both fields are required!")
+    form_username = request.form.get("username")
+    password = request.form.get("password")
+    action = request.form.get("action")
 
-        if action == "register":
-            return _handle_registration(form_username, password)
+    if not form_username or not password:
+        return render_template("auth.html", error="Both fields are required!")
 
-        if action == "login":
-            return _handle_login(form_username, password)
+    if action == "register":
+        return _handle_registration(form_username, password)
+
+    if action == "login":
+        return _handle_login(form_username, password)
 
     return render_template("auth.html", error=error)
 
@@ -38,6 +41,7 @@ def _handle_registration(form_username, password):
         db.session.add(new_user)
         db.session.commit()
 
+        session.clear()
         session["user_id"] = new_user.id
         session["username"] = new_user.login
         return redirect(url_for("feed.show_feed"))
@@ -48,6 +52,7 @@ def _handle_login(form_username, password):
     """Login."""
     user = User.query.filter_by(login=form_username).first()
     if user and check_password_hash(user.password, password):
+        session.clear()
         session["user_id"] = user.id
         session["username"] = user.login
         return redirect(url_for("feed.show_feed"))
