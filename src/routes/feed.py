@@ -67,7 +67,10 @@ def show_feed():
             }
         ]
     return render_template(
-        "feed.html", birds_data=birds_data, username=session.get("login", "User")
+        "feed.html",
+        birds_data=birds_data,
+        username=session.get("username", "User"),
+        logged_in="user_id" in session,
     )
 
 
@@ -76,6 +79,10 @@ def toggle_like(post_id):
     """Like."""
     if "user_id" not in session:
         return jsonify({"error": "Unauthorized"}), 401
+    post = Post.query.get_or_404(post_id)
+    unlocked_posts = session.get("unlocked_posts", [])
+    if post.password and post.id not in unlocked_posts:
+        return jsonify({"error": "Post is locked"}), 403
     user_id = session["user_id"]
     existing_like = Like.query.filter_by(user_id=user_id, post_id=post_id).first()
 
@@ -132,6 +139,10 @@ def unlock(post_id):
 
     password_input = request.form.get("password")
     if not post.password or check_password_hash(post.password, password_input):
+        unlocked_posts = session.get("unlocked_posts", [])
+        if post.id not in unlocked_posts:
+            unlocked_posts.append(post.id)
+            session["unlocked_posts"] = unlocked_posts
         file_url = get_file_url(post.image_filename)
         return jsonify({"success": True, "img": file_url, "loc": post.location}), 200
 
